@@ -12,14 +12,18 @@
 
         function cal() {
             let inputA = JSON.parse(document.querySelector('#input1').value)
-            let intputB =  JSON.parse(document.querySelector('#input2').value)
+            let intputB = JSON.parse(document.querySelector('#input2').value)
 
 
-            let a = inputA.map(n => Math.round(n * 100)).sort()
+            let a = inputA.map(n => Math.round(n * 100)).sort(function (a, b) {
+                return a - b;
+            });
             let mapB = new Map();
             intputB.forEach(n => mapB.set(n, mapB.get(n) ? mapB.get(n) + 1 : 1));
 
-            let bv = [...mapB.keys()].sort();
+            let bv = [...mapB.keys()].sort(function (a, b) {
+                return a - b;
+            });
             let bc = bv.map(n => mapB.get(n));
             bv = bv.map(n => Math.round(100 * parseFloat(n)))
             console.log(a, bv, bc);
@@ -93,27 +97,31 @@
                     throw new Error();
                 }
                 let dp = solve(a[i]);
+                console.log(a[i], dp);
                 let ans = []
                 let num = 0
-                function allSolution(r) {
-                    if (num > 5) {
+                function allSolution(r,p) {
+                    if (num > 10) {
                         return
                     }
                     if (r == 0) {
                         num++;
-                        console.log(i, sum(), bc, num, ans);
-                        try{
+                        console.log(a[i], sum(), bc, num, ans);
+                        try {
                             dfs(i + 1);
-                        }catch(e){
-                            document.querySelector('#rst').insertAdjacentHTML('beforeend',`<li>${a[i]/100} = ${ans.map(n=>n/100).reduce((a,b)=>a+'+'+b,'').substring(1)}</li>`)
+                        } catch (e) {
+                            document.querySelector('#rst').insertAdjacentHTML('beforeend', `<li>${a[i] / 100} = ${ans.map(n => n / 100).reduce((a, b) => a + '+' + b, '').substring(1)}</li>`)
                             throw e;
                         }
-                       
+
                         return;
                     }
                     let x = 0;
 
                     dp[r].forEach(v => {
+                        if(v>p){
+                            return;
+                        }
                         x++;
                         if (bc[bv.indexOf(v)] == 0) {
                             return;
@@ -125,7 +133,7 @@
                         bc[bv.indexOf(v)]++;
                     })
                 }
-                allSolution(a[i]);
+                allSolution(a[i], 1e9);
             }
 
             document.querySelector('#rst').innerHTML = '';
